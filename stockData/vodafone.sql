@@ -1,24 +1,3 @@
-drop table if exists vodafoneidea_analysis;
-
-create table vodafoneidea_analysis as 
-select trading_date, open_price,high_price,low_price,close_price,adj_close,volume,dividends,
-round(((close_price/previous_close)-1)*100::numeric,2) daily_volatility_percentage
-from (
-select date(trading_date) trading_date ,
-	   round(open::numeric,2) open_price,
-	   round(high::numeric,2) high_price,
-	   round(low::numeric,2) low_price,
-	   round(close::numeric,2) close_price,
-	   round(adj_close::numeric,2) adj_close,
-	   volume,dividends,
-	   stock_splits,
-	   round(lead(close,1) over(order by trading_date asc)::numeric,2) previous_close
-	   from vodafoneidea a
-	  ) x; 
-	  
-
-
-
 --Calculating Daily Volatility based on 5 days, 10 days, 30 days, 90 days, 180 days, 365 days dataset for Vodafone
 --How to interpret the output:
 	--For Daily Volatility:
@@ -30,7 +9,6 @@ select date(trading_date) trading_date ,
 				--Compare it against the volatility for 5 days and 10 days and 30 days. 
 				--If the 5/10/30 days volatility is larger than 90/180 but lesser than 365 - Then in the recent 1 month, the stock once again started showing high volatility.
 				--If the 5/10/30 days volatility is lesser than 90/180 and lesser than 365 - Then in the recent 1 month, the stock is showing lower volatility.
-				
 with cte as(
 				select max(trading_date)-5 trading_date5, 
 				max(trading_date)-10 trading_date10, 
@@ -38,47 +16,58 @@ with cte as(
 				max(trading_date)-90 trading_date90,
 				max(trading_date)-180 trading_date180,
 				max(trading_date)-365 trading_date365
-				from vodafoneidea_analysis
-			 )
-select 5 std_duration_in_days,stddev_samp(daily_volatility_percentage) daily_volatility, 
-stddev_samp(daily_volatility_percentage)*sqrt(52) weekly_volatility,
-stddev_samp(daily_volatility_percentage)*sqrt(12) monthly_volatility,
-stddev_samp(daily_volatility_percentage)*sqrt(252) annual_volatility
-from vodafoneidea_analysis v,cte
+				from nse_idea
+			 ),
+nse_idea  as(
+				select  symbol,
+				series,
+				trading_date,
+				open as open_price, 
+				high as high_price, 
+				low as low_price, 
+				close as close_price,
+				round(((close/prev_close)-1*100)::numeric,2) daily_volatility  
+				from nse_idea ni
+			)
+select 5 std_duration_in_days,stddev_samp(daily_volatility)*100 daily_volatility, 
+stddev_samp(daily_volatility)*sqrt(52)*100 weekly_volatility,
+stddev_samp(daily_volatility)*sqrt(12)*100 monthly_volatility,
+stddev_samp(daily_volatility)*sqrt(252)*100 annual_volatility
+from nse_idea v,cte
 where v.trading_date>cte.trading_date5
 union
-select 10 std_duration_in_days,stddev_samp(daily_volatility_percentage) daily_volatility,
-stddev_samp(daily_volatility_percentage)*sqrt(52) weekly_volatility,
-stddev_samp(daily_volatility_percentage)*sqrt(12) monthly_volatility,
-stddev_samp(daily_volatility_percentage)*sqrt(252) annual_volatility
-from vodafoneidea_analysis v,cte
+select 10 std_duration_in_days,stddev_samp(daily_volatility)*100 daily_volatility,
+stddev_samp(daily_volatility)*sqrt(52)*100 weekly_volatility,
+stddev_samp(daily_volatility)*sqrt(12)*100 monthly_volatility,
+stddev_samp(daily_volatility)*sqrt(252)*100 annual_volatility
+from nse_idea v,cte
 where v.trading_date>cte.trading_date10
 union
-select 30 std_duration_in_days,stddev_samp(daily_volatility_percentage) daily_volatility,
-stddev_samp(daily_volatility_percentage)*sqrt(52) weekly_volatility,
-stddev_samp(daily_volatility_percentage)*sqrt(12) monthly_volatility,
-stddev_samp(daily_volatility_percentage)*sqrt(252) annual_volatility
-from vodafoneidea_analysis v,cte
+select 30 std_duration_in_days,stddev_samp(daily_volatility)*100 daily_volatility,
+stddev_samp(daily_volatility)*sqrt(52)*100 weekly_volatility,
+stddev_samp(daily_volatility)*sqrt(12)*100 monthly_volatility,
+stddev_samp(daily_volatility)*sqrt(252)*100 annual_volatility
+from nse_idea v,cte
 where v.trading_date>cte.trading_date30
 union
-select 90 std_duration_in_days,stddev_samp(daily_volatility_percentage) daily_volatility,
-stddev_samp(daily_volatility_percentage)*sqrt(52) weekly_volatility,
-stddev_samp(daily_volatility_percentage)*sqrt(12) monthly_volatility,
-stddev_samp(daily_volatility_percentage)*sqrt(252) annual_volatility
-from vodafoneidea_analysis v,cte
+select 90 std_duration_in_days,stddev_samp(daily_volatility)*100 daily_volatility,
+stddev_samp(daily_volatility)*sqrt(52)*100 weekly_volatility,
+stddev_samp(daily_volatility)*sqrt(12)*100 monthly_volatility,
+stddev_samp(daily_volatility)*sqrt(252)*100 annual_volatility
+from nse_idea v,cte
 where v.trading_date>cte.trading_date90
 union
-select 180 std_duration_in_days,stddev_samp(daily_volatility_percentage) daily_volatility,
-stddev_samp(daily_volatility_percentage)*sqrt(52) weekly_volatility,
-stddev_samp(daily_volatility_percentage)*sqrt(12) monthly_volatility,
-stddev_samp(daily_volatility_percentage)*sqrt(252) annual_volatility
-from vodafoneidea_analysis v,cte
+select 180 std_duration_in_days,stddev_samp(daily_volatility)*100 daily_volatility,
+stddev_samp(daily_volatility)*sqrt(52)*100 weekly_volatility,
+stddev_samp(daily_volatility)*sqrt(12)*100 monthly_volatility,
+stddev_samp(daily_volatility)*sqrt(252)*100 annual_volatility
+from nse_idea v,cte
 where v.trading_date>cte.trading_date180
 union
-select 365 std_duration_in_days,stddev_samp(daily_volatility_percentage) daily_volatility,
-stddev_samp(daily_volatility_percentage)*sqrt(52) weekly_volatility,
-stddev_samp(daily_volatility_percentage)*sqrt(12) monthly_volatility,
-stddev_samp(daily_volatility_percentage)*sqrt(252) annual_volatility
-from vodafoneidea_analysis v,cte
+select 365 std_duration_in_days,stddev_samp(daily_volatility)*100 daily_volatility,
+stddev_samp(daily_volatility)*sqrt(52)*100 weekly_volatility,
+stddev_samp(daily_volatility)*sqrt(12)*100 monthly_volatility,
+stddev_samp(daily_volatility)*sqrt(252)*100 annual_volatility
+from nse_idea v,cte
 where v.trading_date>cte.trading_date365
 order by std_duration_in_days;
