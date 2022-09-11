@@ -1,5 +1,6 @@
 import yfinance as yf
 
+
 def gethistory(stock_symbol,conn):
 
     for stock in stock_symbol:
@@ -7,6 +8,8 @@ def gethistory(stock_symbol,conn):
             stock_name="vodafoneidea"
         elif stock=="^NSEI":
             stock_name="nifty50"
+        elif stock=="^INDIAVIX":
+            stock_name="indiavix"
         else:
             stock_name=""
 
