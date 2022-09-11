@@ -22,7 +22,7 @@ NSE_COLUMN_NAMES={'Symbol': 'symbol',
                   'Turnover': 'turnover',
                   'Trades': 'trades',
                   'Deliverable Volume': 'deliverable_volume',
-                  '%Deliverable': 'percentage_deliverable',
+                  '%Deliverble': 'percentage_deliverable',
                   'Previous': 'previous_close',
                   'Change': 'change',
                   '%Change': 'percentage_change'
