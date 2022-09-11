@@ -6,20 +6,30 @@ import stocks.stockData as sd
 from constant import constants
 
 import nsepy
-from datetime import date
+from datetime import date,timedelta
 
 # Press the green button in the gutter to run the script.
 if __name__ == '__main__':
+    try:
+        """
+        #To get the data from Yahoo Finance
+        symbols= constants.yfinance_symbols #To get the data from Yahoo Finance
+        conn=connect.getConnection()
+        sd.getYahooFinanceHistory(symbols,conn) #To get the data from Yahoo Finance
+        connect.closeConnection(conn)
+        """
 
-    symbols= constants.yfinance_symbols
-    conn=connect.getConnection()
-    sd.getYahooFinanceHistory(symbols,conn)
-    connect.closeConnection(conn)
+        symbols = constants.NSE_SYMBOLS  # To get the data from NSE
+        conn = connect.getConnection()
+        sd.getNseHistory(symbols, conn)
 
+    finally:
+        connect.closeConnection(conn)
 
+    try:
+        connection,cursor=connect.pgCursor()
+        sd.cleanseData(symbols,cursor)
 
-    #stock=nsepy.get_history("IDEA",start=date(1900,1,1),end=date.today(),index=False)
-    #stock = nsepy.get_history("NIFTY 50", start=date(2007, 1, 1), end=date.today(),index=True)
-    #stock = nsepy.get_history("INDIAVIX", start=date(1991, 1, 1), end=date.today(),index=True)
-    #print(stock)
+    finally:
+        connect.pgClose(connection,cursor)
 
