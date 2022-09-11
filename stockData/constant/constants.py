@@ -3,5 +3,5 @@ DB_NAME="stockdb"
 PORT="5432"
 USERNAME="postgres"
 PASSWORD=""
-symbols= ["IDEA.NS", "^NSEI","^INDIAVIX"]
-
+yfinance_symbols= ["IDEA.NS", "^NSEI","^INDIAVIX"]
+nse_symbols= ["IDEA.NS", "^NSEI","^INDIAVIX"]

@@ -1,8 +1,8 @@
 import yfinance as yf
-
-
-def gethistory(stock_symbol,conn):
-
+import nsepy
+from datetime import date
+def getYahooFinanceHistory(stock_symbol,conn):
+    #Below is the code to get the data from Yahoo Finance
     for stock in stock_symbol:
         if stock=="IDEA.NS":
             stock_name="vodafoneidea"
@@ -25,5 +25,7 @@ def gethistory(stock_symbol,conn):
                                 }
                        ,inplace=True)
         history.index.names=['trading_date']
-
         history.to_sql(stock_name, conn, index=True, if_exists='replace')
+
+#def getNseHistory(stock_symbol, conn):
+#        #history=nsepy.get_history()
